@@ -23,7 +23,7 @@ public class WebView2Runtime
     string _silentUninstallCommand;
     public string SilentUninstallCommand { get { return _silentUninstallCommand; } }
 
-    static WebView2Runtime _webView2Runtime;
+    static WebView2Runtime? _webView2Runtime;
     public static WebView2Runtime Current
     {
         get
@@ -35,6 +35,11 @@ public class WebView2Runtime
             }
             return _webView2Runtime;
         }
+    }
+
+    private WebView2Runtime()
+    {
+        _version = _name = _silentUninstallCommand = _location = string.Empty;
     }
 
     void Initialize()
@@ -58,10 +63,11 @@ public class WebView2Runtime
         }
     }
 
-    private string GetValue(RegistryKey registryKey, string value)
+    private string GetValue(RegistryKey registryKey, string valueKey)
     {
         object REG_SZ;
-        REG_SZ = registryKey.GetValue(value);
-        return REG_SZ as string;
+        REG_SZ = registryKey.GetValue(valueKey);
+        string? value = REG_SZ as string;
+        return value is null ? string.Empty : value;
     }
 }
