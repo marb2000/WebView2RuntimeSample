@@ -65,9 +65,7 @@ public class WebView2Runtime
 
     private string GetValue(RegistryKey registryKey, string valueKey)
     {
-        object REG_SZ;
-        REG_SZ = registryKey.GetValue(valueKey);
-        string? value = REG_SZ as string;
+        string? value = registryKey.GetValue(valueKey) as string;
         return value is null ? string.Empty : value;
     }
 }
