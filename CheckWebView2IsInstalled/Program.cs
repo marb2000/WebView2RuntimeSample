@@ -23,8 +23,6 @@ public class WebView2Runtime
     string _silentUninstallCommand;
     public string SilentUninstallCommand { get { return _silentUninstallCommand; } }
 
-    bool isWebView2Initialized = false;
-
     static WebView2Runtime _webView2Runtime;
     public static WebView2Runtime Current
     {
@@ -39,13 +37,12 @@ public class WebView2Runtime
         }
     }
 
-    bool Initialize()
+    void Initialize()
     {
         const string stringKeyPerLocalMachine = "Software\\Wow6432Node\\Microsoft\\EdgeUpdate\\Clients\\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}";
         const string stringKeyPerCurrentUser = "Software\\Microsoft\\EdgeUpdate\\Clients\\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}";
 
-        bool isWebView2Installed = false;
-
+        //When WebView2 is installed, it should be registered on one of two reg keys
         RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(stringKeyPerLocalMachine);
         if (registryKey is null)
         {
@@ -54,28 +51,17 @@ public class WebView2Runtime
 
         if (registryKey is not null)
         {
-            const string versionWebView2 = "pv";
-            const string nameWebView2 = "name";
-            const string locationWebView2 = "location";
-            const string silentUninstallWebView2 = "SilentUninstall";
-
-            object versionREG_SZ;
-            object nameREG_SZ;
-            object locationREG_SZ;
-            object silentREG_SZ;
-
-            versionREG_SZ = registryKey.GetValue(versionWebView2);
-            nameREG_SZ = registryKey.GetValue(nameWebView2);
-            locationREG_SZ = registryKey.GetValue(locationWebView2);
-            silentREG_SZ = registryKey.GetValue(silentUninstallWebView2);
-
-            _version = versionREG_SZ as string;
-            _name = nameREG_SZ as string;
-            _location = locationREG_SZ as string;
-            _silentUninstallCommand = silentREG_SZ as string;
-
-            isWebView2Installed = true;
+            _version = GetValue(registryKey, "pv");
+            _name = GetValue(registryKey, "name");
+            _location = GetValue(registryKey, "location");
+            _silentUninstallCommand = GetValue(registryKey, "SilentUninstall");
         }
-        return isWebView2Installed;
+    }
+
+    private string GetValue(RegistryKey registryKey, string value)
+    {
+        object REG_SZ;
+        REG_SZ = registryKey.GetValue(value);
+        return REG_SZ as string;
     }
 }
